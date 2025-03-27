@@ -1,11 +1,13 @@
-import classNames from "classnames";
-import {useState} from "react";
+import classNames from 'classnames';
+import {useState} from 'react';
 
 type TextInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   hint?: string;
   outlined?: boolean;
+  error?: string;
 };
-const TextInput = ({hint, outlined = true, ...props}: TextInputProps) => {
+
+const TextInput = ({hint, outlined = true, error, ...props}: TextInputProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const [hasValue, setHasValue] = useState(false);
 
@@ -16,14 +18,14 @@ const TextInput = ({hint, outlined = true, ...props}: TextInputProps) => {
   };
 
   return (
-    <div className="relative">
-      {hint && (
+    <div className={classNames('relative', {'mb-5': error === undefined})}>
+      {hint && ( 
         <label
           className={classNames(
-            "absolute left-2 transition-all duration-200 pointer-events-none",
+            'absolute left-2 transition-all duration-200 pointer-events-none',
             {
-              "-top-2.50 text-sm text-gray-600": isFocused || hasValue,
-              "top-1/2 -translate-y-1/2 text-gray-400": !isFocused && !hasValue,
+              '-top-3 text-sm bg-white text-gray-600': isFocused || hasValue,
+              'top-1/2 -translate-y-1/2 text-gray-400': !isFocused && !hasValue,
             }
           )}
         >
@@ -32,14 +34,17 @@ const TextInput = ({hint, outlined = true, ...props}: TextInputProps) => {
       )}
       <input
         className={classNames(
-          "w-full px-2 py-1 outline-none",
-          {"border border-solid border-b-gray-600": outlined}
+          'w-full px-2 py-1 outline-none',
+          {'border border-solid border-b-gray-600': outlined}
         )}
         onFocus={handleFocus}
         onBlur={handleBlur}
         onChange={(event) => setHasValue(!!event.target.value)}
         {...props}
       />
+      {error && (
+        <div className="text-red-500 text-sm">{error}</div>
+      )}
     </div>
   );
 };

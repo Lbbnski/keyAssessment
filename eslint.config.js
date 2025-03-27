@@ -24,9 +24,10 @@ export default tseslint.config(
         {allowConstantExport: true},
       ],
       indent: ['error', 2],
-      'max-len': ['error', {code: 120}],
+      'max-len': ['error', {code: 120, ignoreComments: true, ignoreStrings: true}],
       'no-warning-comments': ['warn', {terms: ['TODO'], location: 'start'}],
-      'no-console': ['error', {allow: []}],
+      'no-console': ['error', {allow: ['warn', 'error']}],
+      'quotes': ['error', 'single', {avoidEscape: true, allowTemplateLiterals: true}],
     },
   },
 )
