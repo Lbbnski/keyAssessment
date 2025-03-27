@@ -1,4 +1,3 @@
-import './App.css'
 import {useState} from 'react';
 import {isLoggedIn} from './api/user.ts';
 import Login from './pages/login.tsx';
