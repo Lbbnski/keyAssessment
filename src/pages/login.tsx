@@ -1,22 +1,61 @@
 import TextInput from '../components/input/text.tsx';
 import Button from '../components/input/button.tsx';
 import {useEffect, useState} from 'react';
+import {checkAuth, LOGIN_JWT, setLoggedIn} from '../util/user.ts';
+import {useMutation} from '@apollo/client';
+import {setContext} from '@apollo/client/link/context';
 
 const Login = () => {
+  checkAuth();
+  const [loginRequest, {loading, error}] = useMutation(LOGIN_JWT);
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [disableLogin, setDisableLogin] = useState<boolean>(true);
 
+  useEffect(() => {
+    const handleKeyPress = (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter' && !disableLogin && !loading) {
+        login();
+      }
+    };
+    document.addEventListener('keypress', handleKeyPress);
+    return () => {
+      document.removeEventListener('keypress', handleKeyPress);
+    };
+  }, []);
+  
   useEffect(() => {
     setDisableLogin(username.length === 0 || password.length === 0)
   }, [username, password]);
 
+  const login = () => {
+    const deviceKind= 'Admin';
+    loginRequest({variables: {username, password, deviceKind}}).then(res => {
+      setLoggedIn(JSON.stringify(res.data.Auth.loginJwt))
+      setContext((_, { headers }) => ({
+        headers: {
+          ...headers,
+          authorization: res.data.Auth.loginJwt.jwtTokens.accessToken,
+        },
+      }))
+    }).catch(err => {
+      console.log(err)
+    });
+  }
+
   return ( 
     <>
-      <div className="flex flex-col gap-4">
-        <TextInput hint="Benutzername" type="text"/>
-        <TextInput hint="Passwort" type="password"/>
-        <Button title="Login" disabled={disableLogin}/>
+      <div className="flex flex-col gap-2 max-w-2xl mx-auto my-auto p-4">
+        <TextInput error={error} content={username} update={value => setUsername(value)}  hint="Benutzername" type="text"/>
+        <TextInput error={error}
+          content={password}
+          update={value => setPassword(value)}
+          prependInnerActionIcon={{
+            icon: showPassword ? 'eye' : 'eye-slash',
+            action: () => setShowPassword(!showPassword)}}
+          hint="Passwort" type="password"/>
+        <Button title="Login" onClick={login} loading={loading} disabled={disableLogin}/>
       </div>
     </>
   )

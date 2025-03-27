@@ -1,10 +1,13 @@
 import classNames from 'classnames';
 import {useState} from 'react';
+import {ApolloError} from '@apollo/client';
 
 type TextInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   hint?: string;
   outlined?: boolean;
-  error?: string;
+  error?: ApolloError;
+  update: (value: string) => void;
+  prependInnerActionIcon?: { icon: string; action: () => void };
 };
 
 const TextInput = ({hint, outlined = true, error, ...props}: TextInputProps) => {
@@ -17,7 +20,7 @@ const TextInput = ({hint, outlined = true, error, ...props}: TextInputProps) => 
     setHasValue(!!event.target.value);
   };
 
-  return (
+  return (<>
     <div className={classNames('relative', {'mb-5': error === undefined})}>
       {hint && ( 
         <label
@@ -39,13 +42,23 @@ const TextInput = ({hint, outlined = true, error, ...props}: TextInputProps) => 
         )}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        onChange={(event) => setHasValue(!!event.target.value)}
+        onChange={(event) => props.update(event.target.value)}
         {...props}
       />
-      {error && (
-        <div className="text-red-500 text-sm">{error}</div>
+      {props.prependInnerActionIcon && (
+        <button
+          type="button"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          onClick={props.prependInnerActionIcon?.action}
+        >
+          <i className={classNames('material-icons', props.prependInnerActionIcon?.icon)}></i>
+        </button>
       )}
     </div>
+    {error && (
+      <div className="text-red-500 text-sm">{error.message}</div>
+    )}
+  </>
   );
 };
 
