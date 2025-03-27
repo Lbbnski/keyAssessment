@@ -1,0 +1,2 @@
+schema: https://staging.api.constellation.academy/api/graphql
+documents: '**/*.graphql'
