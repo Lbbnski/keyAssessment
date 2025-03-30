@@ -1,4 +1,4 @@
-import Spinner from '../spinner.tsx';
+import React from 'react';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   title?: string
@@ -6,15 +6,14 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   loading?: boolean
 };
 
-const Button = ({title, disabled, loading = false, onClick, ...props}: ButtonProps) => {
+const Button: React.FC<ButtonProps> = ({title, disabled, loading = false, onClick, ...props}: ButtonProps) => {
   return <button
     disabled={disabled}
     onClick={onClick}
     {...props}>
     {title}
-    {loading ?? (
-      //https://flowbite.com/docs/components/spinner/
-      <Spinner/>)}
+    {loading && (
+      <span className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></span>)}
   </button>
 }
 
